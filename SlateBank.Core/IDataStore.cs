@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using SlateBank.Core.Entities;
 
 namespace SlateBank.Core
@@ -15,6 +16,8 @@ namespace SlateBank.Core
         void DeleteCustomer(string customerID);
 
         void UpdateCustomer(Customer customer);
+
+        List<Customer> GetCustomers();
 
         void CreateAccount(Account account);
 

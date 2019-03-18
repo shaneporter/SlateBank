@@ -51,7 +51,7 @@ namespace SlateBank.Core
             // sequential:
             var countString = (_customers.Count + 1).ToString();
 
-            return countString.PadLeft(CustomerIdentifierLength - countString.Length);
+            return countString.PadLeft(CustomerIdentifierLength - countString.Length + 1, '0');
         }
 
         public string GenerateAccountNumber()
@@ -59,7 +59,7 @@ namespace SlateBank.Core
             // sequential, but prefixed with a 1:
             var countString = (_accounts.Count + 1).ToString();
 
-            return '1' + countString.PadLeft(AccountNumberLength - countString.Length - 1);
+            return '1' + countString.PadLeft(AccountNumberLength - countString.Length, '0');
         }
 
         public bool AccountNumberExists(string accountNumber)
@@ -79,6 +79,11 @@ namespace SlateBank.Core
             return (from c in _customers
                 where c.ID == customerID
                 select c).First();
+        }
+
+        public List<Customer> GetCustomers()
+        {
+            return _customers;
         }
 
         public void DeleteCustomer(string customerID)
