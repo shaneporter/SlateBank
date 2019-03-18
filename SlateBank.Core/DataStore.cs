@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Net.Sockets;
 using SlateBank.Core.Entities;
 
@@ -15,7 +17,33 @@ namespace SlateBank.Core
             
         public DataStore()
         {
-            // TODO: generate some dummy data:
+            #region Generate dummy data
+            for (var loop = 0; loop < 5; loop++)
+            {
+                var accountNumber = GenerateAccountNumber();
+                var customerID = GenerateCustomerID();
+                
+                _customers.Add(new Customer
+                {
+                    ID = customerID,
+                    Name = $"User {loop + 1}",
+                    DateOfBirth = new DateTime(1990 - (loop * 2), (loop + 1) * 2, (loop + 4) * 2),
+                    Address =  $"Flat {loop + 1}, 120 Beach View, Southend",
+                    AccountNumber = accountNumber,
+                    IsActive = loop != 3 
+                });
+                
+                _accounts.Add(new Account()
+                {
+                    CustomerID = customerID,
+                    AccountNumber = accountNumber,
+                    Balance = loop + 2000 + new Random().Next(0, 2500),
+                    IsActive = loop != 3,
+                    OverdraftLimit = loop % 2 == 0 ? 500: 0,
+                    Transactions = new List<AccountTransaction>()
+                });
+            }
+            #endregion
         }
         
         public string GenerateCustomerID()
