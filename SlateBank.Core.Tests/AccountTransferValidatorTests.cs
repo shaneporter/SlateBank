@@ -1,4 +1,5 @@
 using FluentValidation.TestHelper;
+using Moq;
 using SlateBank.Core.Entities;
 using Xunit;
 
@@ -10,7 +11,15 @@ namespace SlateBank.Core.Tests
 
         public AccountTransferValidatorTests()
         {
-            Validator = new AccountTransferValidator();
+            Validator = new AccountTransferValidator(new Mock<IDataStore>().Object);
+        }
+
+        private AccountTransferValidator GetAccountNumberExistsValidator(string accountNumber, bool shouldReturn)
+        {
+            // do some setup for constructor DI:
+            var dataStoreMock = new Mock<IDataStore>();
+            dataStoreMock.Setup(ds => ds.AccountNumberExists(accountNumber)).Returns(shouldReturn);
+            return new AccountTransferValidator(dataStoreMock.Object);
         }
         
         [Fact]
@@ -47,7 +56,40 @@ namespace SlateBank.Core.Tests
             Validator.ShouldHaveValidationErrorFor(a => a.Description, at);
         }
         
-        // TODO FromAccount tests
-        // TODO ToAccount tests
+        [Fact]
+        public void Should_Pass_For_Found_FromAccountNumber()
+        {
+            const string accountNumber = "100";
+            var atv = GetAccountNumberExistsValidator(accountNumber, true);
+            var accountTransfer = new AccountTransfer { FromAccount = accountNumber};
+            atv.ShouldNotHaveValidationErrorFor(a => a.FromAccount, accountTransfer);
+        }
+
+        [Fact]
+        public void Should_Fail_For_NotFound_FromAccountNumber()
+        {
+            const string accountNumber = "100";
+            var atv = GetAccountNumberExistsValidator(accountNumber, false);
+            var accountTransfer = new AccountTransfer { FromAccount = accountNumber};
+            atv.ShouldHaveValidationErrorFor(a => a.FromAccount, accountTransfer);
+        }
+        
+        [Fact]
+        public void Should_Pass_For_Found_ToAccountNumber()
+        {
+            const string accountNumber = "100";
+            var atv = GetAccountNumberExistsValidator(accountNumber, true);
+            var accountTransfer = new AccountTransfer { ToAccount = accountNumber};
+            atv.ShouldHaveValidationErrorFor(a => a.ToAccount, accountTransfer);
+        }
+
+        [Fact]
+        public void Should_Fail_For_NotFound_ToAccountNumber()
+        {
+            const string accountNumber = "100";
+            var atv = GetAccountNumberExistsValidator(accountNumber, false);
+            var accountTransfer = new AccountTransfer { ToAccount = accountNumber};
+            atv.ShouldNotHaveValidationErrorFor(a => a.ToAccount, accountTransfer);
+        }
     }
 }

@@ -12,11 +12,11 @@ namespace SlateBank.Core.Entities
 
     public class AccountTransferValidator : AbstractValidator<AccountTransfer>
     {
-        public AccountTransferValidator()
+        public AccountTransferValidator(IDataStore dataStore)
         {
             RuleFor(at => at.Amount).GreaterThanOrEqualTo(0m);
-            // TODO: RuleFor(FromAccount)
-            // TODO: RuleFor(ToAccount)
+            RuleFor(at => at.FromAccount).Must(dataStore.AccountNumberExists);
+            RuleFor(at => at.ToAccount).Must(dataStore.AccountNumberExists);
             RuleFor(at => at.Description).NotNull().MinimumLength(3);
         }
     }

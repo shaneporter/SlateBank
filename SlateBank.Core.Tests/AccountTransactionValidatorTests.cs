@@ -1,6 +1,8 @@
+using System.Diagnostics;
 using FluentValidation.TestHelper;
 using SlateBank.Core.Entities;
 using Xunit;
+using Moq;
 
 namespace SlateBank.Core.Tests
 {
@@ -10,7 +12,8 @@ namespace SlateBank.Core.Tests
 
         public AccountTransactionValidatorTests()
         {
-            Validator = new AccountTransactionValidator();
+            // use dummy for default Validator constructor parameter:
+            Validator = new AccountTransactionValidator(new Mock<IDataStore>().Object);
         }
 
         [Fact]
@@ -45,6 +48,32 @@ namespace SlateBank.Core.Tests
             Validator.ShouldHaveValidationErrorFor(a => a.Description, at);
             at.Description = null;
             Validator.ShouldHaveValidationErrorFor(a => a.Description, at);
+        }
+
+        [Fact]
+        public void Should_Pass_For_Found_AccountNumber()
+        {
+            // do some setup for constructor DI:
+            var dataStoreMock = new Mock<IDataStore>();
+            const string accountNumber = "100";
+            dataStoreMock.Setup(ds => ds.AccountNumberExists(accountNumber)).Returns(true);
+            
+            var atv = new AccountTransactionValidator(dataStoreMock.Object);
+            var accountTransaction = new AccountTransaction {AccountNumber = accountNumber};
+            atv.ShouldNotHaveValidationErrorFor(a => a.AccountNumber, accountTransaction);
+        }
+
+        [Fact]
+        public void Should_Fail_For_NotFound_AccountNumber()
+        {
+            // do some setup for constructor DI:
+            var dataStoreMock = new Mock<IDataStore>();
+            const string accountNumber = "100";
+            dataStoreMock.Setup(ds => ds.AccountNumberExists(accountNumber)).Returns(false);
+
+            var atv = new AccountTransactionValidator(dataStoreMock.Object);
+            var accountTransaction = new AccountTransaction {AccountNumber = accountNumber};
+            atv.ShouldHaveValidationErrorFor(a => a.AccountNumber, accountTransaction);
         }
     }
 }

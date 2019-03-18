@@ -11,7 +11,7 @@ namespace SlateBank.Core.Entities
         public decimal OverdraftLimit { get; set; }
         public bool IsActive { get; set; }
         
-        public IEnumerable<AccountTransaction> Transactions { get; set; }
+        public IList<AccountTransaction> Transactions { get; set; }
     }
     
     public class AccountValidator : AbstractValidator<Account>
