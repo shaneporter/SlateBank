@@ -3,7 +3,7 @@ using FluentValidation.TestHelper;
 using SlateBank.Core.Entities;
 using Xunit;
 
-namespace SlateBank.Core.Tests
+namespace SlateBank.Core.Tests.Entities
 {
     public class CustomerValidatorTests
     {

@@ -4,7 +4,7 @@ using SlateBank.Core.Entities;
 using Xunit;
 using Moq;
 
-namespace SlateBank.Core.Tests
+namespace SlateBank.Core.Tests.Entities
 {
     public class AccountTransactionValidatorTests
     {

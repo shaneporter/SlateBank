@@ -5,11 +5,13 @@ namespace SlateBank.Core
 {
     public interface IDataStore
     {
+        short IdentifierLength { get; }
+        
         string GenerateCustomerID();
 
         bool AccountNumberExists(string accountNumber);
 
-        void AddCustomer(Customer customer);
+        string AddCustomer(Customer customer);
 
         Customer GetCustomer(string customerID);
 
@@ -22,6 +24,10 @@ namespace SlateBank.Core
         void CreateAccount(Account account);
 
         void DeleteAccount(string customerID);
+
+        List<Account> GetAccounts();
+
+        Account GetAccount(string accountNumber);
 
         void Deposit(AccountTransaction transaction);
 

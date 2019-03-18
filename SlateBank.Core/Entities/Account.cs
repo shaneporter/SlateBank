@@ -16,10 +16,10 @@ namespace SlateBank.Core.Entities
     
     public class AccountValidator : AbstractValidator<Account>
     {
-        public AccountValidator()
+        public AccountValidator(IDataStore dataStore)
         {
-            RuleFor(c => c.CustomerID).Length(8);
-            RuleFor(c => c.AccountNumber).Length(8);
+            RuleFor(c => c.CustomerID).Length(dataStore.IdentifierLength);
+            RuleFor(c => c.AccountNumber).Length(dataStore.IdentifierLength);
             RuleFor(c => c.OverdraftLimit).InclusiveBetween(0, 1000);
         }
     }

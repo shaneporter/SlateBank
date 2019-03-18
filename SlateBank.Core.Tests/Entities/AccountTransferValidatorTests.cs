@@ -3,7 +3,7 @@ using Moq;
 using SlateBank.Core.Entities;
 using Xunit;
 
-namespace SlateBank.Core.Tests
+namespace SlateBank.Core.Tests.Entities
 {
     public class AccountTransferValidatorTests
     {
@@ -80,7 +80,7 @@ namespace SlateBank.Core.Tests
             const string accountNumber = "100";
             var atv = GetAccountNumberExistsValidator(accountNumber, true);
             var accountTransfer = new AccountTransfer { ToAccount = accountNumber};
-            atv.ShouldHaveValidationErrorFor(a => a.ToAccount, accountTransfer);
+            atv.ShouldNotHaveValidationErrorFor(a => a.ToAccount, accountTransfer);
         }
 
         [Fact]
@@ -89,7 +89,7 @@ namespace SlateBank.Core.Tests
             const string accountNumber = "100";
             var atv = GetAccountNumberExistsValidator(accountNumber, false);
             var accountTransfer = new AccountTransfer { ToAccount = accountNumber};
-            atv.ShouldNotHaveValidationErrorFor(a => a.ToAccount, accountTransfer);
+            atv.ShouldHaveValidationErrorFor(a => a.ToAccount, accountTransfer);
         }
     }
 }

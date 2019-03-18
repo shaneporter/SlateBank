@@ -11,9 +11,6 @@ namespace SlateBank.Core
     {
         private List<Customer> _customers = new List<Customer>();
         private List<Account> _accounts = new List<Account>();
-        
-        private static short CustomerIdentifierLength = 8;
-        private static short AccountNumberLength = 8;
             
         public DataStore()
         {
@@ -45,13 +42,15 @@ namespace SlateBank.Core
             }
             #endregion
         }
-        
+
+        public short IdentifierLength => 8;
+
         public string GenerateCustomerID()
         {
             // sequential:
             var countString = (_customers.Count + 1).ToString();
 
-            return countString.PadLeft(CustomerIdentifierLength - countString.Length + 1, '0');
+            return countString.PadLeft(IdentifierLength - countString.Length + 1, '0');
         }
 
         public string GenerateAccountNumber()
@@ -59,7 +58,7 @@ namespace SlateBank.Core
             // sequential, but prefixed with a 1:
             var countString = (_accounts.Count + 1).ToString();
 
-            return '1' + countString.PadLeft(AccountNumberLength - countString.Length, '0');
+            return '1' + countString.PadLeft(IdentifierLength - countString.Length, '0');
         }
 
         public bool AccountNumberExists(string accountNumber)
@@ -69,10 +68,11 @@ namespace SlateBank.Core
                 select a).Any();
         }
 
-        public void AddCustomer(Customer customer)
+        public string AddCustomer(Customer customer)
         {
             customer.ID = GenerateCustomerID();
             _customers.Add(customer);
+            return customer.ID;
         }
 
         public Customer GetCustomer(string customerID)
@@ -90,45 +90,71 @@ namespace SlateBank.Core
         public void DeleteCustomer(string customerID)
         {
             var customerToDelete = GetCustomer(customerID);
+            
+            var accountToDelete = (from a in _accounts
+                where a.CustomerID == customerID
+                select a).FirstOrDefault();
 
             customerToDelete.IsActive = false;
-            
-            DeleteAccount(customerID);
+
+            if (accountToDelete != null)
+            {
+                DeleteAccount(accountToDelete.AccountNumber);
+            }
         }
 
         public void UpdateCustomer(Customer customer)
         {
             var customerToUpdate = (from c in _customers
                 where c.ID == customer.ID
-                select c).First();
+                select c).FirstOrDefault();
+
+            if (customerToUpdate == null)
+            {
+                throw new Exception("Customer not found");
+            }
+            
+            customerToUpdate.Name = customer.Name;
+            customerToUpdate.Address = customer.Address;
+            customerToUpdate.DateOfBirth = customer.DateOfBirth;
         }
 
         public void CreateAccount(Account account)
         {   
             account.AccountNumber = GenerateAccountNumber();
+            account.IsActive = true;
             _accounts.Add(account);
         }
 
-        public void DeleteAccount(string customerID)
+        public void DeleteAccount(string accountNumber)
         {
             // update the account for this customer:
             var accountToDelete = (from a in _accounts
-                where a.CustomerID == customerID
+                where a.AccountNumber == accountNumber
                 select a).First();
 
             accountToDelete.IsActive = false;        
         }
 
-        private Account GetAccount(string accountNumber)
+        public Account GetAccount(string accountNumber)
         {
             return (from a in _accounts
                 where a.AccountNumber == accountNumber
                 select a).First();
         }
+
+        public List<Account> GetAccounts()
+        {
+            return _accounts;
+        }
         
         public void Deposit(AccountTransaction transaction)
         {
             var account = GetAccount(transaction.AccountNumber);
+            if (account.Transactions == null)
+            {
+                account.Transactions = new List<AccountTransaction>();
+            }
             account.Transactions.Add(transaction);
             account.Balance += transaction.Amount;
         }
@@ -136,6 +162,16 @@ namespace SlateBank.Core
         public void Withdraw(AccountTransaction transaction)
         {
             var account = GetAccount(transaction.AccountNumber);
+            
+            if (account.Balance - transaction.Amount < account.OverdraftLimit)
+            {
+                throw new Exception("Account has insufficient funds for withdrawal");
+            }
+            
+            if (account.Transactions == null)
+            {
+                account.Transactions = new List<AccountTransaction>();
+            }
             account.Transactions.Add(transaction);
             account.Balance -= transaction.Amount;        
         }

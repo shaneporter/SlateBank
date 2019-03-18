@@ -2,19 +2,24 @@ using System;
 using System.Linq.Expressions;
 using System.Reflection;
 using FluentValidation.TestHelper;
+using Moq;
 using Xunit;
 using SlateBank.Core.Entities;
 using SlateBank.Core.Tests.Utils;
 
-namespace SlateBank.Core.Tests
+namespace SlateBank.Core.Tests.Entities
 {
     public class AccountValidatorTests
     {
         private AccountValidator Validator { get; }
+        private short IdentifierLength => 8;
 
         public AccountValidatorTests()
         {
-            Validator = new AccountValidator();
+            var dataStoreMock = new Mock<IDataStore>();
+            dataStoreMock.SetupGet(dsm => dsm.IdentifierLength).Returns(8);
+            
+            Validator = new AccountValidator(dataStoreMock.Object);
         }
 
         private void TestLength(int expectedLength, Expression<Func<Account, string>> exp)
@@ -34,13 +39,13 @@ namespace SlateBank.Core.Tests
         [Fact]
         public void Should_Pass_For_Customer_Length()
         {
-            TestLength(8, a => a.CustomerID);
+            TestLength(IdentifierLength, a => a.CustomerID);
         }
 
         [Fact]
         public void Should_Pass_For_AccountNumber_Length()
         {
-            TestLength(8, a => a.AccountNumber);
+            TestLength(IdentifierLength, a => a.AccountNumber);
         }
 
         [Fact]
