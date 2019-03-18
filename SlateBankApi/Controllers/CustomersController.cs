@@ -1,7 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using SlateBank.Core;
 using SlateBank.Core.Entities;
@@ -12,8 +9,12 @@ namespace SlateBankApi.Controllers
     [ApiController]
     public class CustomersController : ControllerBase
     {
-        // TODO: inject this dependency
-        DataStore _dataStore = new DataStore();
+        private IDataStore _dataStore;
+
+        public CustomersController(IDataStore dataStore)
+        {
+            _dataStore = dataStore;
+        }
         
         // GET api/customers
         [HttpGet]
