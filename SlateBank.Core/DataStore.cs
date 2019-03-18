@@ -71,6 +71,7 @@ namespace SlateBank.Core
 
         public void AddCustomer(Customer customer)
         {
+            customer.ID = GenerateCustomerID();
             _customers.Add(customer);
         }
 
@@ -103,7 +104,8 @@ namespace SlateBank.Core
         }
 
         public void CreateAccount(Account account)
-        {
+        {   
+            account.AccountNumber = GenerateAccountNumber();
             _accounts.Add(account);
         }
 
@@ -146,7 +148,13 @@ namespace SlateBank.Core
 
             var fromCustomer = GetCustomer(fromAccount.CustomerID);
             var toCustomer = GetCustomer(toAccount.CustomerID);
-                
+            
+            // does from account have enough funds for the transaction?
+            if (fromAccount.Balance - transfer.Amount < fromAccount.OverdraftLimit)
+            {
+                throw new Exception("From account has insufficient funds for transfer");
+            }
+            
             // create two transactions based on the transfer:
             var fromTransaction = new AccountTransaction
             {
