@@ -34,7 +34,7 @@ namespace SlateBank.Core.Entities
             RuleFor(c => c.Name).NotNull().MinimumLength(5);
             RuleFor(c => c.DateOfBirth).Must(dob => GetDifferenceInYears(dob, DateTime.Now) >= 18);
             RuleFor(c => c.Address).NotNull().MinimumLength(10);
-            RuleFor(c => c.AccountNumber).NotNull().Matches("^[0-9]{8}$");
+            //RuleFor(c => c.AccountNumber).NotNull().Matches("^[0-9]{8}$");
         }
     }
 }

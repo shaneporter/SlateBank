@@ -9,6 +9,7 @@ using SlateBank.Core.Tests.Utils;
 
 namespace SlateBank.Core.Tests.Entities
 {
+    /*
     public class AccountValidatorTests
     {
         private AccountValidator Validator { get; }
@@ -61,4 +62,5 @@ namespace SlateBank.Core.Tests.Entities
             }
         }
     }
+    */
 }

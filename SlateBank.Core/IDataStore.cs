@@ -7,32 +7,28 @@ namespace SlateBank.Core
     {
         short IdentifierLength { get; }
         
-        string GenerateCustomerID();
+        //string GenerateCustomerID();
 
         bool AccountNumberExists(string accountNumber);
 
-        string AddCustomer(Customer customer);
+        Customer AddCustomer(Customer customer);
 
         Customer GetCustomer(string customerID);
 
-        void DeleteCustomer(string customerID);
+        Customer DeleteCustomer(string customerID);
 
-        void UpdateCustomer(Customer customer);
+        Customer UpdateCustomer(Customer customer);
 
         List<Customer> GetCustomers();
-
-        void CreateAccount(Account account);
-
-        void DeleteAccount(string customerID);
-
+       
         List<Account> GetAccounts();
 
         Account GetAccount(string accountNumber);
 
-        void Deposit(AccountTransaction transaction);
+        AccountTransaction Deposit(AccountTransaction transaction);
 
-        void Withdraw(AccountTransaction transaction);
+        AccountTransaction Withdraw(AccountTransaction transaction);
 
-        void Transfer(AccountTransfer transfer);
+        AccountTransfer Transfer(AccountTransfer transfer);
     }
 }

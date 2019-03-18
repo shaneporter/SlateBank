@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using SlateBank.Core;
@@ -28,21 +27,46 @@ namespace SlateBankApi.Controllers
         [HttpGet("{id}")]
         public ActionResult<Customer> Get(string id)
         {
-            return _dataStore.GetCustomer(id);
-        }
-        
-        // POST api/values
-        [HttpPost]
-        public void Post([FromBody] Customer customer)
-        {
-            //_dataStore.AddCustomer(customer);
+            var customer = _dataStore.GetCustomer(id);
 
-            
+            if (customer != null)
+            {
+                return customer;
+            }
+
+            return NotFound();
         }
-        
-//        [HttpPut("{id}")]
-//        public void Put(int id, [FromBody] string value)
-//        {
-//        }
+
+        [HttpPost]
+        public ActionResult<Customer> Post([FromBody] Customer customer)
+        {
+            return _dataStore.AddCustomer(customer);
+        }
+
+        [HttpDelete("{id}")]
+        public ActionResult<Customer> Delete(string id)
+        {
+            var customer = _dataStore.GetCustomer(id);
+
+            if (customer == null)
+            {
+                return NotFound();
+            }
+            
+            return _dataStore.DeleteCustomer(id);
+        }
+
+        [HttpPut("{id}")]
+        public ActionResult<Customer> Update([FromBody] Customer customer)
+        {
+            var customerToUpdate = _dataStore.GetCustomer(customer.ID);
+
+            if (customerToUpdate == null)
+            {
+                return NotFound();
+            }
+
+            return _dataStore.UpdateCustomer(customer);
+        }
     }
 }

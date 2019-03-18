@@ -1,5 +1,6 @@
 using System;
 using SlateBank.Core.Entities;
+using SlateBank.Core.Exceptions;
 using Xunit;
 
 namespace SlateBank.Core.Tests
@@ -52,14 +53,18 @@ namespace SlateBank.Core.Tests
                 Name = "Martin Peters"
             };
             
-            var customerID = ds.AddCustomer(newCustomer);
+            var customer = ds.AddCustomer(newCustomer);
 
-            var addedCustomer = ds.GetCustomer(customerID);
+            var addedCustomer = ds.GetCustomer(customer.ID);
+            var addedBankAccount = ds.GetAccount(addedCustomer.AccountNumber);
 
-            Assert.Equal(customerID, addedCustomer.ID);
+            Assert.Equal(customer.ID, addedCustomer.ID);
             Assert.Equal(newCustomer.Address, addedCustomer.Address);
             Assert.Equal(newCustomer.DateOfBirth, addedCustomer.DateOfBirth);
             Assert.Equal(newCustomer.Name, addedCustomer.Name);
+
+            Assert.Equal(0, addedBankAccount.Transactions.Count);
+            Assert.True(addedBankAccount.IsActive);
         }
 
         [Fact]
@@ -88,7 +93,7 @@ namespace SlateBank.Core.Tests
             var ex = Record.Exception(() => { ds.UpdateCustomer(customer); });
             
             Assert.NotNull(ex);
-            Assert.IsType<Exception>(ex);
+            Assert.IsType<CustomerNotFoundException>(ex);
         }
 
         [Fact]
@@ -112,34 +117,17 @@ namespace SlateBank.Core.Tests
         }
 
         [Fact]
-        public void Add_Account_Updates_Accounts_With_Expected_Value()
+        public void Delete_User_Updates_Active_Flag()
         {
             var ds = new DataStore();
-
-            var account = new Account()
-            {
-                CustomerID = "00000001"
-            };
-           
-            ds.CreateAccount(account);
-
-            var addedAccount = ds.GetAccount("10000006");
-            
-            Assert.Equal(0.0m, addedAccount.Balance);
-            Assert.Equal(true, addedAccount.IsActive); 
-            Assert.Equal(account.CustomerID, addedAccount.CustomerID);
-        }
-
-        [Fact]
-        public void Delete_Account_Updates_Active_Flag()
-        {
-            var ds = new DataStore();
+            const string customerNumber = "00000001";
             const string accountNumber = "10000001";
             
             Assert.True(ds.GetAccount(accountNumber).IsActive); 
             
-            ds.DeleteAccount(accountNumber);
+            ds.DeleteCustomer(customerNumber);
             
+            Assert.False(ds.GetCustomer(customerNumber).IsActive); 
             Assert.False(ds.GetAccount(accountNumber).IsActive); 
         }
 
@@ -155,7 +143,7 @@ namespace SlateBank.Core.Tests
             }));
             
             Assert.NotNull(ex);
-            Assert.IsType<Exception>(ex);
+            Assert.IsType<InsufficientFundsException>(ex);
             Assert.Equal(0, ds.GetAccount(accountNumber).Transactions.Count);
         }
         
@@ -195,7 +183,7 @@ namespace SlateBank.Core.Tests
             }));
             
             Assert.NotNull(ex);
-            Assert.IsType<Exception>(ex);
+            Assert.IsType<InsufficientFundsException>(ex);
             
             Assert.Equal(0, ds.GetAccount(fromAccount).Transactions.Count);
             Assert.Equal(0, ds.GetAccount(toAccount).Transactions.Count);

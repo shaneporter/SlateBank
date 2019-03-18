@@ -6,7 +6,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlateBank.Core.Tests", "Sla
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlateBank.Core", "SlateBank.Core\SlateBank.Core.csproj", "{3F73D64D-1E7D-4B32-9F18-BA3B31A77CF4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlateBankApi.IntegrationTests", "SlateBankApi.IntegrationTests\SlateBankApi.IntegrationTests.csproj", "{5219819D-8102-4F75-BDC4-5FA3293E3066}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlateBankApi.Tests", "SlateBankApi.Tests\SlateBankApi.Tests.csproj", "{5219819D-8102-4F75-BDC4-5FA3293E3066}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

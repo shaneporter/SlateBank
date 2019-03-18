@@ -4,13 +4,14 @@ using System.Linq;
 using System.Net.Http.Headers;
 using System.Net.Sockets;
 using SlateBank.Core.Entities;
+using SlateBank.Core.Exceptions;
 
 namespace SlateBank.Core
 {
     public class DataStore : IDataStore
     {
-        private List<Customer> _customers = new List<Customer>();
-        private List<Account> _accounts = new List<Account>();
+        private readonly List<Customer> _customers = new List<Customer>();
+        private readonly List<Account> _accounts = new List<Account>();
             
         public DataStore()
         {
@@ -68,26 +69,39 @@ namespace SlateBank.Core
                 select a).Any();
         }
 
-        public string AddCustomer(Customer customer)
+        public Customer AddCustomer(Customer customer)
         {
+            // generate the ID:
             customer.ID = GenerateCustomerID();
+            
+            // 0 the date of birth:
+            customer.DateOfBirth = customer.DateOfBirth.Date;
+            
+            // create an account:    
+            var accountNumber = CreateAccount(customer.ID);
+
+            customer.AccountNumber = accountNumber;
+            customer.IsActive = true;
+                
+            // add the customer:
             _customers.Add(customer);
-            return customer.ID;
+            
+            return customer;
         }
 
         public Customer GetCustomer(string customerID)
         {
             return (from c in _customers
                 where c.ID == customerID
-                select c).First();
+                select c).FirstOrDefault();
         }
 
         public List<Customer> GetCustomers()
-        {
+        {            
             return _customers;
         }
 
-        public void DeleteCustomer(string customerID)
+        public Customer DeleteCustomer(string customerID)
         {
             var customerToDelete = GetCustomer(customerID);
             
@@ -97,13 +111,16 @@ namespace SlateBank.Core
 
             customerToDelete.IsActive = false;
 
+            // shouldn't be null, over-defensive?
             if (accountToDelete != null)
             {
                 DeleteAccount(accountToDelete.AccountNumber);
             }
+
+            return customerToDelete;
         }
 
-        public void UpdateCustomer(Customer customer)
+        public Customer UpdateCustomer(Customer customer)
         {
             var customerToUpdate = (from c in _customers
                 where c.ID == customer.ID
@@ -111,36 +128,48 @@ namespace SlateBank.Core
 
             if (customerToUpdate == null)
             {
-                throw new Exception("Customer not found");
+                throw new CustomerNotFoundException("Customer not found");
             }
             
             customerToUpdate.Name = customer.Name;
             customerToUpdate.Address = customer.Address;
             customerToUpdate.DateOfBirth = customer.DateOfBirth;
+
+            return customerToUpdate;
         }
 
-        public void CreateAccount(Account account)
-        {   
-            account.AccountNumber = GenerateAccountNumber();
-            account.IsActive = true;
-            _accounts.Add(account);
+        private string CreateAccount(string customerID)
+        {
+            var newAccount = new Account
+            {
+                AccountNumber = GenerateAccountNumber(),
+                CustomerID = customerID,
+                IsActive = true,
+                Transactions = new List<AccountTransaction>()
+            };
+
+            _accounts.Add(newAccount);
+            return newAccount.AccountNumber;
         }
 
-        public void DeleteAccount(string accountNumber)
+        private void DeleteAccount(string accountNumber)
         {
             // update the account for this customer:
             var accountToDelete = (from a in _accounts
                 where a.AccountNumber == accountNumber
-                select a).First();
+                select a).FirstOrDefault();
 
-            accountToDelete.IsActive = false;        
+            if (accountToDelete != null)
+            {
+                accountToDelete.IsActive = false;        
+            }
         }
 
         public Account GetAccount(string accountNumber)
         {
             return (from a in _accounts
                 where a.AccountNumber == accountNumber
-                select a).First();
+                select a).FirstOrDefault();
         }
 
         public List<Account> GetAccounts()
@@ -148,24 +177,41 @@ namespace SlateBank.Core
             return _accounts;
         }
         
-        public void Deposit(AccountTransaction transaction)
+        public AccountTransaction Deposit(AccountTransaction transaction)
         {
             var account = GetAccount(transaction.AccountNumber);
+
+            if (account == null)
+            {
+                throw new AccountException("Cannot deposit to inactive account");
+            }
+            
+            transaction.TransactionType = TransactionType.Debit;
+
             if (account.Transactions == null)
             {
                 account.Transactions = new List<AccountTransaction>();
             }
             account.Transactions.Add(transaction);
             account.Balance += transaction.Amount;
+
+            return transaction;
         }
 
-        public void Withdraw(AccountTransaction transaction)
+        public AccountTransaction Withdraw(AccountTransaction transaction)
         {
             var account = GetAccount(transaction.AccountNumber);
             
-            if (account.Balance - transaction.Amount < account.OverdraftLimit)
+            if (account == null)
             {
-                throw new Exception("Account has insufficient funds for withdrawal");
+                throw new AccountException("Cannot withdraw from inactive account");
+            }
+            
+            transaction.TransactionType = TransactionType.Credit;
+            
+            if (account.Balance - transaction.Amount < -account.OverdraftLimit)
+            {
+                throw new InsufficientFundsException("Account has insufficient funds for withdrawal");
             }
             
             if (account.Transactions == null)
@@ -173,22 +219,34 @@ namespace SlateBank.Core
                 account.Transactions = new List<AccountTransaction>();
             }
             account.Transactions.Add(transaction);
-            account.Balance -= transaction.Amount;        
+            account.Balance -= transaction.Amount;
+
+            return transaction;
         }
 
-        public void Transfer(AccountTransfer transfer)
+        public AccountTransfer Transfer(AccountTransfer transfer)
         {
             // get customer details
             var fromAccount = GetAccount(transfer.FromAccount);
             var toAccount = GetAccount(transfer.ToAccount);
 
+            if (!fromAccount.IsActive)
+            {
+                throw new AccountException("From account inactive");
+            }
+
+            if (!toAccount.IsActive)
+            {
+                throw new AccountException("To account inactive");
+            }
+
             var fromCustomer = GetCustomer(fromAccount.CustomerID);
             var toCustomer = GetCustomer(toAccount.CustomerID);
             
             // does from account have enough funds for the transaction?
-            if (fromAccount.Balance - transfer.Amount < fromAccount.OverdraftLimit)
+            if (fromAccount.Balance - transfer.Amount < -fromAccount.OverdraftLimit)
             {
-                throw new Exception("From account has insufficient funds for transfer");
+                throw new InsufficientFundsException("From account has insufficient funds for transfer");
             }
             
             // create two transactions based on the transfer:
@@ -209,6 +267,8 @@ namespace SlateBank.Core
 
             Withdraw(fromTransaction);
             Deposit(toTransaction);
+
+            return transfer;
         }
     }
 }

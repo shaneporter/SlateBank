@@ -1,0 +1,166 @@
+{
+	"variables": [],
+	"info": {
+		"name": "SlateBank",
+		"_postman_id": "18170592-b5e9-ab7b-2b18-94ab8c2cc8ba",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "https://localhost:5001/api/customers/",
+			"request": {
+				"url": "https://localhost:5001/api/accounts/",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": "Get all customers"
+			},
+			"response": []
+		},
+		{
+			"name": "https://localhost:5001/api/customers/00000005",
+			"request": {
+				"url": "https://localhost:5001/api/customers/00000005",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": "Get customer by ID"
+			},
+			"response": []
+		},
+		{
+			"name": "https://localhost:5001/api/customers/",
+			"request": {
+				"url": "https://localhost:5001/api/customers/",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"Name\": \"Shane Porter\",\n\t\"Address\": \"24 Wordsworth Drive\",\n\t\"DateOfBirth\": \"1984-02-08T00:00:00Z\"\n}"
+				},
+				"description": "Create customer"
+			},
+			"response": []
+		},
+		{
+			"name": "https://localhost:5001/api/customers/00000005",
+			"request": {
+				"url": "https://localhost:5001/api/customers/00000005",
+				"method": "DELETE",
+				"header": [],
+				"body": {},
+				"description": "Delete customer"
+			},
+			"response": []
+		},
+		{
+			"name": "https://localhost:5001/api/customers/00000005",
+			"request": {
+				"url": "https://localhost:5001/api/customers/00000005",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"Id\": \"00000005\",\n\t\"Name\": \"Martin Simpson\",\n\t\"Address\": \"102 Dudley Road, Wolverhampton\",\n\t\"DateOfBirth\": \"1938-06-11T00:00:00Z\"\n}"
+				},
+				"description": "Update customer"
+			},
+			"response": []
+		},
+		{
+			"name": "https://localhost:5001/api/accounts/",
+			"request": {
+				"url": "https://localhost:5001/api/accounts/",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": "Get all accounts"
+			},
+			"response": []
+		},
+		{
+			"name": "https://localhost:5001/api/accounts/10000001",
+			"request": {
+				"url": "https://localhost:5001/api/accounts/",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": "Get account"
+			},
+			"response": []
+		},
+		{
+			"name": "https://localhost:5001/api/accounts/withdraw",
+			"request": {
+				"url": "https://localhost:5001/api/accounts/",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"Amount\": 100,\n\t\"Description\": \"Cash machine withdrawal\",\n\t\"AccountNumber\": \"10000001\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "https://localhost:5001/api/accounts/deposit",
+			"request": {
+				"url": "https://localhost:5001/api/accounts/deposit",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"Amount\": 100,\n\t\"Description\": \"Cash machine desposit\",\n\t\"AccountNumber\": \"10000001\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "https://localhost:5001/api/accounts/transfer",
+			"request": {
+				"url": "https://localhost:5001/api/accounts/transfer",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"Amount\": 100,\n\t\"Description\": \"Birthday present\",\n\t\"FromAccount\": \"10000001\",\n\t\"ToAccount\": \"10000002\"\n}"
+				},
+				"description": "make a transfer"
+			},
+			"response": []
+		}
+	]
+}
