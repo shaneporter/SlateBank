@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using SlateBank.Core;
 using SlateBank.Core.Entities;
@@ -10,16 +12,19 @@ namespace SlateBankApi.Controllers
     public class CustomersController : ControllerBase
     {
         private readonly IDataStore _dataStore;
+        private readonly IMediator _mediator;
 
-        public CustomersController(IDataStore dataStore)
+        public CustomersController(IDataStore dataStore, IMediator mediator)
         {
             _dataStore = dataStore;
+            _mediator = mediator;
         }
         
         // GET api/customers
         [HttpGet]
-        public ActionResult<IEnumerable<Customer>> Get()
+        public async Task<ActionResult<IEnumerable<Customer>>> Get()
         {
+            await _mediator.Publish(new SomeEvent("Hello World"));
             return _dataStore.GetCustomers();
         }
         

@@ -136,7 +136,7 @@ namespace SlateBank.Core.Tests
         {
             var ds = new DataStore();
             const string accountNumber = "10000001";
-            var ex = Record.Exception(() => ds.Withdraw(new AccountTransaction
+            var ex = Record.Exception(() => ds.Debit(new AccountTransaction
             {
                 Amount = 5000m,
                 AccountNumber = accountNumber
@@ -157,7 +157,7 @@ namespace SlateBank.Core.Tests
             var account = ds.GetAccount(accountNumber);
             var initialBalance = account.Balance;
             
-            ds.Withdraw(new AccountTransaction
+            ds.Debit(new AccountTransaction
             {
                 Amount = amountToWithdraw,
                 AccountNumber = accountNumber

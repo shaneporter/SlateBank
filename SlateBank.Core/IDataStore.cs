@@ -11,6 +11,10 @@ namespace SlateBank.Core
 
         bool AccountNumberExists(string accountNumber);
 
+        bool IsAccountActive(string accountNumber);
+
+        bool IsDebitPossible(string accountNumber, decimal amount);
+
         Customer AddCustomer(Customer customer);
 
         Customer GetCustomer(string customerID);
@@ -25,9 +29,9 @@ namespace SlateBank.Core
 
         Account GetAccount(string accountNumber);
 
-        AccountTransaction Deposit(AccountTransaction transaction);
+        AccountTransaction Credit(AccountTransaction transaction);
 
-        AccountTransaction Withdraw(AccountTransaction transaction);
+        AccountTransaction Debit(AccountTransaction transaction);
 
         AccountTransfer Transfer(AccountTransfer transfer);
     }

@@ -18,7 +18,7 @@ namespace SlateBank.Core.Entities
         private int GetDifferenceInYears(DateTime startDate, DateTime endDate)
         {
             //Excel documentation says "COMPLETE calendar years in between dates"
-            int years = endDate.Year - startDate.Year;
+            var years = endDate.Year - startDate.Year;
 
             if (startDate.Month == endDate.Month &&// if the start month and the end month are the same
                 endDate.Day < startDate.Day// AND the end day is less than the start day
@@ -34,7 +34,6 @@ namespace SlateBank.Core.Entities
             RuleFor(c => c.Name).NotNull().MinimumLength(5);
             RuleFor(c => c.DateOfBirth).Must(dob => GetDifferenceInYears(dob, DateTime.Now) >= 18);
             RuleFor(c => c.Address).NotNull().MinimumLength(10);
-            //RuleFor(c => c.AccountNumber).NotNull().Matches("^[0-9]{8}$");
         }
     }
 }

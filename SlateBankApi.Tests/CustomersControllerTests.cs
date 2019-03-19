@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
+using MediatR;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.TestHost;
@@ -19,11 +21,14 @@ namespace SlateBankApi.IntegrationTests
     {
         private readonly CustomersController _controller;
         private readonly Mock<IDataStore> _mock;
+        private readonly Mock<IMediator> _mediatorMock;
         private readonly IDataStore _dataStore;
+        private readonly IMediator _mediator;
 
         public CustomerControllerTests()
         {
             _mock = new Mock<IDataStore>();
+            _mediatorMock = new Mock<IMediator>();
 
             _mock.Setup(m => m.GetCustomers()).Returns(new List<Customer>
             {
@@ -36,18 +41,23 @@ namespace SlateBankApi.IntegrationTests
                 Name = "Customer1"
             });
 
+//            _mediatorMock
+//                .Setup(m => m.Publish(It.IsAny<SomeEvent>()))
+//                .ReturnsAsync(new Task());
+
             // setup mock:
             _dataStore = _mock.Object;
-            _controller = new CustomersController(_dataStore);
+            _mediator = _mediatorMock.Object;
+            _controller = new CustomersController(_dataStore, _mediator);
         }
 
         [Fact]
         public void Test_Get_Customers_Returns_Expected_Count()
         {
            var result = _controller.Get();
-           Assert.True(result.Value.Count() == 2);
+           Assert.True(result.Result.Value.Count() == 2);
         }
-
+        
         [Fact]
         public void Test_Get_Customer_Returns_Valid_Customer()
         {

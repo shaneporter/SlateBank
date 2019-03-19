@@ -14,9 +14,11 @@ namespace SlateBank.Core.Entities
     {
         public AccountTransferValidator(IDataStore dataStore)
         {
-            RuleFor(at => at.Amount).GreaterThanOrEqualTo(0m);
-            RuleFor(at => at.FromAccount).Must(dataStore.AccountNumberExists);
-            RuleFor(at => at.ToAccount).Must(dataStore.AccountNumberExists);
+            RuleFor(at => at.Amount).GreaterThan(0m);
+            RuleFor(at => at.FromAccount).Must(dataStore.AccountNumberExists).WithMessage("'From Account' not found");
+            RuleFor(at => at.ToAccount).Must(dataStore.AccountNumberExists).WithMessage("'To Account' not found");
+            RuleFor(at => new {at.FromAccount, at.Amount}).Must(details =>
+                dataStore.IsDebitPossible(details.FromAccount, details.Amount)).When(at => at.Amount > 0).WithMessage("'From Account' has insufficient funds");
             RuleFor(at => at.Description).NotNull().MinimumLength(3);
         }
     }

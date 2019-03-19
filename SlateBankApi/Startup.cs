@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System.Reflection;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SlateBank.Core;
 using FluentValidation.AspNetCore;
+using MediatR;
 using SlateBank.Core.Entities;
 
 namespace SlateBankApi
@@ -25,6 +27,8 @@ namespace SlateBankApi
                 .AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
                 .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<CustomerValidator>());
+            
+            services.AddMediatR(typeof(Startup).GetTypeInfo().Assembly);
 
             services.AddSingleton<IDataStore, DataStore>();
         }

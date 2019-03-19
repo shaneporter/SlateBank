@@ -22,9 +22,17 @@ namespace SlateBank.Core.Entities
     {
         public AccountTransactionValidator(IDataStore dataStore)
         {
-            RuleFor(at => at.Amount).GreaterThanOrEqualTo(0m);
-            RuleFor(at => at.Description).NotNull().MinimumLength(3);
             RuleFor(at => at.AccountNumber).Must(dataStore.AccountNumberExists);
+            RuleFor(at => at.AccountNumber).Must(dataStore.IsAccountActive)
+                .WithMessage("Cannot do transaction with inactive account");
+            RuleFor(at => at.Amount).GreaterThan(0m);
+            
+            RuleFor(at => new {at.AccountNumber, at.Amount}).Must(details =>
+                    dataStore.IsDebitPossible(details.AccountNumber, details.Amount))
+                .When(at => at.TransactionType == TransactionType.Debit && at.Amount > 0)
+                .WithMessage("Insufficient Funds");
+            
+            RuleFor(at => at.Description).NotNull().MinimumLength(3);
         }
     }
 }

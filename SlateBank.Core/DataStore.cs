@@ -69,6 +69,24 @@ namespace SlateBank.Core
                 select a).Any();
         }
 
+        public bool IsAccountActive(string accountNumber)
+        {
+            var account = GetAccount(accountNumber);
+
+            return !(account == null || !account.IsActive);
+        }
+
+        public bool IsDebitPossible(string accountNumber, decimal amount)
+        {
+            if (!IsAccountActive(accountNumber))
+                return false;
+
+            // refactor this - code above already calls GetAccount:
+            var account = GetAccount(accountNumber);
+            
+            return !(account.Balance - amount < -account.OverdraftLimit);
+        }
+
         public Customer AddCustomer(Customer customer)
         {
             // generate the ID:
@@ -177,13 +195,13 @@ namespace SlateBank.Core
             return _accounts;
         }
         
-        public AccountTransaction Deposit(AccountTransaction transaction)
+        public AccountTransaction Credit(AccountTransaction transaction)
         {
             var account = GetAccount(transaction.AccountNumber);
 
             if (account == null)
             {
-                throw new AccountException("Cannot deposit to inactive account");
+                throw new AccountException("Cannot credit to inactive account");
             }
             
             transaction.TransactionType = TransactionType.Debit;
@@ -198,20 +216,20 @@ namespace SlateBank.Core
             return transaction;
         }
 
-        public AccountTransaction Withdraw(AccountTransaction transaction)
+        public AccountTransaction Debit(AccountTransaction transaction)
         {
             var account = GetAccount(transaction.AccountNumber);
             
             if (account == null)
             {
-                throw new AccountException("Cannot withdraw from inactive account");
+                throw new AccountException("Cannot debit from inactive account");
             }
             
             transaction.TransactionType = TransactionType.Credit;
             
             if (account.Balance - transaction.Amount < -account.OverdraftLimit)
             {
-                throw new InsufficientFundsException("Account has insufficient funds for withdrawal");
+                throw new InsufficientFundsException("Account has insufficient funds for debit");
             }
             
             if (account.Transactions == null)
@@ -265,8 +283,8 @@ namespace SlateBank.Core
                 TransactionType = TransactionType.Transfer
             };
 
-            Withdraw(fromTransaction);
-            Deposit(toTransaction);
+            Debit(fromTransaction);
+            Credit(toTransaction);
 
             return transfer;
         }

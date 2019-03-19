@@ -54,33 +54,33 @@ namespace SlateBankApi.IntegrationTests
         }
 
         [Fact]
-        public void Test_That_Throwing_Withdraw_Returns_Bad_Request()
+        public void Test_That_Throwing_Debit_Returns_Bad_Request()
         {
-            var at = new AccountTransaction() { Amount = 19.99m };
+            var at = new AccountTransaction() { Amount = 19.99m, TransactionType = TransactionType.Debit };
             
-            _mock.Setup(m => m.Withdraw(at)).Throws(new InsufficientFundsException());
-            var result = _controller.Withdraw(at);
+            _mock.Setup(m => m.Debit(at)).Throws(new InsufficientFundsException());
+            var result = _controller.Transaction(at);
             Assert.IsType<BadRequestResult>(result.Result);
         }
         
         [Fact]
-        public void Test_That_Valid_Withdraw_Calls_Withdraw_Once()
+        public void Test_That_Valid_Debit_Calls_Debit_Once()
         {
-            var at = new AccountTransaction() { Amount = 19.99m };
+            var at = new AccountTransaction() { Amount = 19.99m, TransactionType = TransactionType.Debit };
 
-            _mock.Setup(m => m.Withdraw(at)).Returns(at);
-            var result = _controller.Withdraw(at);
-            _mock.Verify(m => m.Withdraw(at), Times.Once);
+            _mock.Setup(m => m.Debit(at)).Returns(at);
+            var result = _controller.Transaction(at);
+            _mock.Verify(m => m.Debit(at), Times.Once);
         }
         
         [Fact]
-        public void Test_That_Valid_Deposit_Calls_Deposit_Once()
+        public void Test_That_Valid_Credit_Calls_Credit_Once()
         {
-            var at = new AccountTransaction() { Amount = 19.99m };
+            var at = new AccountTransaction() { Amount = 19.99m, TransactionType = TransactionType.Credit };
 
-            _mock.Setup(m => m.Deposit(at)).Returns(at);
-            var result = _controller.Deposit(at);
-            _mock.Verify(m => m.Deposit(at), Times.Once);
+            _mock.Setup(m => m.Credit(at)).Returns(at);
+            var result = _controller.Transaction(at);
+            _mock.Verify(m => m.Credit(at), Times.Once);
         }
         
         [Fact]

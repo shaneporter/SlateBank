@@ -23,12 +23,19 @@ namespace SlateBank.Core.Tests.Entities
         }
         
         [Fact]
-        public void Should_Pass_For_Positive_Or_Zero_Amount()
+        public void Should_Pass_For_Positive_Amount()
         {
             var at = new AccountTransfer {Amount = 100m};
             Validator.ShouldNotHaveValidationErrorFor(a => a.Amount, at);
-            at.Amount = 0.0m;
+            at.Amount = 0.01m;
             Validator.ShouldNotHaveValidationErrorFor(a => a.Amount, at);
+        }
+        
+        [Fact]
+        public void Should_Fail_For_Zero_Amount()
+        {
+            var at = new AccountTransfer {Amount = 0m };
+            Validator.ShouldHaveValidationErrorFor(a => a.Amount, at);
         }
 
         [Fact]

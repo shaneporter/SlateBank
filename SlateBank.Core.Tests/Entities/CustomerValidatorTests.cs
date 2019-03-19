@@ -72,14 +72,5 @@ namespace SlateBank.Core.Tests.Entities
             c.Address = null;
             Validator.ShouldHaveValidationErrorFor(customer => customer.Address, c);
         }        
-        /*
-         *
-            RuleFor(c => c.DateOfBirth)
-                .InclusiveBetween(currentDate.AddYears(-100).AddDays(-1), currentDate.AddYears(-18));
-            RuleFor(c => c.Address).MinimumLength(10);
-            RuleFor(c => c.AccountNumber).Matches("^[0-9]{8}$");
-         *
-         * 
-         */
     }
 }

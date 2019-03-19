@@ -33,23 +33,22 @@ namespace SlateBankApi.Controllers
             return (ActionResult<Account>) account ?? NotFound();
         }
         
-        [HttpPut("withdraw")]
-        public ActionResult<AccountTransaction> Withdraw([FromBody] AccountTransaction accountTransaction)
+        [HttpPut("transaction")]
+        public ActionResult<AccountTransaction> Transaction([FromBody] AccountTransaction accountTransaction)
         {
             try
             {
-                return _dataStore.Withdraw(accountTransaction);
+                if (accountTransaction.TransactionType == TransactionType.Debit)
+                {
+                    return _dataStore.Debit(accountTransaction);
+                }
+
+                return _dataStore.Credit(accountTransaction);
             }
             catch (InsufficientFundsException)
             {
                 return BadRequest();
             }
-        }
-        
-        [HttpPut("deposit")]
-        public ActionResult<AccountTransaction> Deposit([FromBody] AccountTransaction accountTransaction)
-        {
-            return _dataStore.Deposit(accountTransaction);
         }
         
         [HttpPut("transfer")]
