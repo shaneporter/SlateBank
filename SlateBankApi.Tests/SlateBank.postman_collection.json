@@ -103,46 +103,6 @@
 			"response": []
 		},
 		{
-			"name": "https://localhost:5001/api/accounts/withdraw",
-			"request": {
-				"url": "https://localhost:5001/api/accounts/",
-				"method": "PUT",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json",
-						"description": ""
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n\t\"Amount\": 100,\n\t\"Description\": \"Cash machine withdrawal\",\n\t\"AccountNumber\": \"10000001\"\n}"
-				},
-				"description": ""
-			},
-			"response": []
-		},
-		{
-			"name": "https://localhost:5001/api/accounts/deposit",
-			"request": {
-				"url": "https://localhost:5001/api/accounts/deposit",
-				"method": "PUT",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json",
-						"description": ""
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n\t\"Amount\": 100,\n\t\"Description\": \"Cash machine desposit\",\n\t\"AccountNumber\": \"10000001\"\n}"
-				},
-				"description": ""
-			},
-			"response": []
-		},
-		{
 			"name": "https://localhost:5001/api/accounts/transfer",
 			"request": {
 				"url": "https://localhost:5001/api/accounts/transfer",
@@ -159,6 +119,46 @@
 					"raw": "{\n\t\"Amount\": 100,\n\t\"Description\": \"Birthday present\",\n\t\"FromAccount\": \"10000001\",\n\t\"ToAccount\": \"10000002\"\n}"
 				},
 				"description": "make a transfer"
+			},
+			"response": []
+		},
+		{
+			"name": "https://localhost:5001/api/accounts/transaction DEBIT",
+			"request": {
+				"url": "https://localhost:5001/api/accounts/transaction",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"Amount\": 50,\n\t\"Description\": \"Cash machine withdrawal\",\n\t\"AccountNumber\": \"10000001\",\n\t\"TransactionType\": \"Debit\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "https://localhost:5001/api/accounts/transaction CREDIT",
+			"request": {
+				"url": "https://localhost:5001/api/accounts/transaction",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"Amount\": 50,\n\t\"Description\": \"Branch Paying-in Machine\",\n\t\"AccountNumber\": \"10000001\",\n\t\"TransactionType\": \"Credit\"\n}"
+				},
+				"description": ""
 			},
 			"response": []
 		}

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using SlateBank.Core.Entities;
 
 namespace SlateBank.Core
@@ -7,8 +8,6 @@ namespace SlateBank.Core
     {
         short IdentifierLength { get; }
         
-        //string GenerateCustomerID();
-
         bool AccountNumberExists(string accountNumber);
 
         bool IsAccountActive(string accountNumber);

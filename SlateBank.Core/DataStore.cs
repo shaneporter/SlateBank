@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Net.Sockets;
+using System.Threading.Tasks;
+using MediatR;
 using SlateBank.Core.Entities;
+using SlateBank.Core.Events;
 using SlateBank.Core.Exceptions;
 
 namespace SlateBank.Core
@@ -12,35 +15,37 @@ namespace SlateBank.Core
     {
         private readonly List<Customer> _customers = new List<Customer>();
         private readonly List<Account> _accounts = new List<Account>();
-            
+
         public DataStore()
         {
             #region Generate dummy data
+
             for (var loop = 0; loop < 5; loop++)
             {
                 var accountNumber = GenerateAccountNumber();
                 var customerID = GenerateCustomerID();
-                
+
                 _customers.Add(new Customer
                 {
                     ID = customerID,
                     Name = $"User {loop + 1}",
                     DateOfBirth = new DateTime(1990 - (loop * 2), (loop + 1) * 2, (loop + 4) * 2),
-                    Address =  $"Flat {loop + 1}, 120 Beach View, Southend",
+                    Address = $"Flat {loop + 1}, 120 Beach View, Southend",
                     AccountNumber = accountNumber,
-                    IsActive = loop != 3 
+                    IsActive = loop != 3
                 });
-                
+
                 _accounts.Add(new Account()
                 {
                     CustomerID = customerID,
                     AccountNumber = accountNumber,
                     Balance = loop + 2000 + new Random().Next(0, 2500),
                     IsActive = loop != 3,
-                    OverdraftLimit = loop % 2 == 0 ? 500: 0,
+                    OverdraftLimit = loop % 2 == 0 ? 500 : 0,
                     Transactions = new List<AccountTransaction>()
                 });
             }
+
             #endregion
         }
 
@@ -285,7 +290,7 @@ namespace SlateBank.Core
 
             Debit(fromTransaction);
             Credit(toTransaction);
-
+            
             return transfer;
         }
     }

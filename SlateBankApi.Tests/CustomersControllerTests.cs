@@ -1,14 +1,7 @@
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
 using MediatR;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.TestHost;
 using Moq;
 using SlateBank.Core;
 using SlateBank.Core.Entities;
@@ -55,7 +48,7 @@ namespace SlateBankApi.IntegrationTests
         public void Test_Get_Customers_Returns_Expected_Count()
         {
            var result = _controller.Get();
-           Assert.True(result.Result.Value.Count() == 2);
+           Assert.True(result.Value.Count() == 2);
         }
         
         [Fact]

@@ -22,9 +22,8 @@ namespace SlateBankApi.Controllers
         
         // GET api/customers
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Customer>>> Get()
+        public ActionResult<IEnumerable<Customer>> Get()
         {
-            await _mediator.Publish(new SomeEvent("Hello World"));
             return _dataStore.GetCustomers();
         }
         
